@@ -95,3 +95,8 @@ The instance journal now includes a **Group Prep** tab with a saved checklist fo
 - Review the instance map, entrance and boss order
 
 Checklist progress is stored locally per character and per instance. Use Reset checklist to clear the selected instance's preparation state. This is a planning aid, not an automatic group-readiness check.
+
+
+## Boss index fallback
+
+The Bosses & Loot tab now falls back to the instance's verified map boss markers when a detailed boss record is not yet available. It lists the mapped boss names and floors, while clearly labelling missing encounter notes and loot tables as not yet indexed. This exposes the boss locations already present in the map data without inventing strategies or loot.
