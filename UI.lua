@@ -400,10 +400,11 @@ local function CreateWindow()
   }
   local x = 12
   for _, tab in ipairs(tabs) do
-    local b = MakeButton(panel, tab.label, tab.id=="bosses" and 115 or 88, 25, function() Tool:SetTab(tab.id) end)
+    local width = tab.id=="bosses" and 108 or (tab.id=="prep" and 86 or 68)
+    local b = MakeButton(panel, tab.label, width, 25, function() Tool:SetTab(tab.id) end)
     b:SetPoint("TOPLEFT", x, -12)
     tabButtons[tab.id] = b
-    x = x + (tab.id=="bosses" and 121 or (tab.id=="prep" and 98 or 94))
+    x = x + width + 5
   end
   local fav = MakeButton(panel, "☆ Favourite", 100, 25, function()
     local entry = Tool:GetSelected()
