@@ -281,15 +281,35 @@ end
 
 local function RenderBosses(entry)
   local bosses = Tool:GetBosses(entry.id)
+  local map = Tool:GetMapData(entry.id)
+  local mapOnly = false
+  if #bosses == 0 and map and map.markers then
+    local seen = {}
+    for _, marker in ipairs(map.markers) do
+      if marker.kind == "boss" and marker.name and not seen[marker.name] then
+        seen[marker.name] = true
+        bosses[#bosses+1] = {name=marker.name,notes=marker.note,floor=marker.floor,mapOnly=true}
+      end
+    end
+    mapOnly = #bosses > 0
+  end
   if #bosses == 0 then
-    SetDetailText(entry.name, "BOSSES & LOOT", "No verified boss records have been added for this instance yet.\n\nBoss pages will include encounter notes, abilities, loot tables, item tooltips, drop information and profession recipes.")
+    SetDetailText(entry.name, "BOSSES & LOOT", "No verified boss records or boss map markers have been indexed for this instance yet.\n\nBoss data will be added from verified Forever sources.")
     return
   end
   local lines = {}
+  if mapOnly then
+    lines[#lines+1] = "BOSS LOCATIONS FROM THE INSTANCE MAP"
+    lines[#lines+1] = "These names are sourced from verified map markers. Detailed abilities and loot tables are not yet indexed for this instance."
+    lines[#lines+1] = ""
+  end
   for _, boss in ipairs(bosses) do
     lines[#lines+1] = (boss.name or "Unknown boss") .. (boss.rare and " [RARE]" or "")
+    if boss.floor then lines[#lines+1] = "  Floor: " .. tostring(boss.floor) end
     lines[#lines+1] = "  " .. tostring(boss.notes or "Encounter notes not yet indexed.")
+    local lootCount = #(boss.loot or {})
     for _, item in ipairs(boss.loot or {}) do lines[#lines+1] = "  • " .. tostring(item.name or item.itemID) end
+    if lootCount == 0 then lines[#lines+1] = "  Loot table: not yet indexed." end
     lines[#lines+1] = ""
   end
   SetDetailText(entry.name, "BOSSES & LOOT", table.concat(lines, "\n"))
