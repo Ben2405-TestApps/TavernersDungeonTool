@@ -101,20 +101,55 @@ function Tool:Search(query)
   return results
 end
 function Tool:GetQuests(id)
-  local result = {}
-  for _, quest in ipairs(Data.quests or {}) do
-    if quest.dungeonID == id then result[#result+1] = quest end
+  local result,seen = {},{}
+  local function normal(value)
+    return tostring(value or ""):lower():gsub("’","'"):gsub("%s+"," "):gsub("^%s+",""):gsub("%s+$","")
   end
-  -- Merge the separately maintained Wowhead Forever quest index from Quest Companion.
+  local function add(quest,source)
+    local name=normal(quest.name or quest.title)
+    local giver=normal(quest.giver)
+    local faction=normal(quest.faction)
+    local key=name.."|"..giver.."|"..faction
+    if name~="" and not seen[key] then
+      seen[key]=true
+      quest.source=quest.source or source
+      result[#result+1]=quest
+    end
+  end
+  for _,quest in ipairs(Data.quests or {}) do
+    if quest.dungeonID == id then add(quest,"Dungeon Tool catalogue") end
+  end
+  -- Merge the separately maintained Forever quest index from Quest Companion.
   local entry = Data:GetByID(id)
   local companion = Core.modules and Core.modules.QuestCompanion
   if entry and companion and companion.GetDungeonQuests then
-    for _, q in ipairs(companion:GetDungeonQuests(entry.name)) do
-      result[#result+1] = {name=q.name, level=q.level, faction=q.faction, giver=q.giver,
-        giverLocation=q.location, coordinates=q.coords, prerequisites=q.prerequisite, objective=q.objective}
+    for _,q in ipairs(companion:GetDungeonQuests(entry.name)) do
+      add({name=q.name,level=q.level,faction=q.faction,giver=q.giver,
+        giverLocation=q.location,coordinates=q.coords,prerequisites=q.prerequisite,
+        objective=q.objective,source="Quest Companion curated index"},"Quest Companion")
     end
   end
+  table.sort(result,function(a,b)
+    local al,bl=tonumber(a.level) or 0,tonumber(b.level) or 0
+    if al~=bl then return al<bl end
+    return tostring(a.name or "")<tostring(b.name or "")
+  end)
   return result
+end
+function Tool:GetQuestGiverStops(id)
+  local stops,seen={},{}
+  for _,quest in ipairs(self:GetQuests(id)) do
+    local coords=quest.coordinates or quest.coords
+    if coords then
+      local key=tostring(quest.giverLocation or quest.location or "").."|"..tostring(coords)
+      if not seen[key] then
+        seen[key]=true
+        stops[#stops+1]={name=quest.giver or quest.name,location=quest.giverLocation or quest.location,
+          coordinates=coords,quest=quest.name,faction=quest.faction}
+      end
+    end
+  end
+  return stops
 end
 function Tool:GetMapData(id) return self.mapData[id] end
 function Tool:GetBosses(id)
