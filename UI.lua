@@ -8,7 +8,7 @@ if not Core or not Tool then return end
 local theme = Core.Theme or {}
 local gold = theme.gold or {0.88, 0.68, 0.28}
 local selectedID
-local frame, listContent, detailTitle, detailSub, detailBody, searchBox, tabButtons = nil, nil, nil, nil, nil, nil, {}
+local frame, listContent, detailTitle, detailSub, detailBody, searchBox, tabButtons, typeButton, favouriteFilterButton, favouriteButton = nil, nil, nil, nil, nil, nil, {}, nil, nil, nil
 
 local function CreateBackdrop(target)
   if not target.SetBackdrop then return end
@@ -49,6 +49,7 @@ local function RenderOverview(entry)
     entry.description or "Dungeon information",
     "",
     "Recommended level: " .. tostring(entry.minLevel or "?") .. "–" .. tostring(entry.maxLevel or "?"),
+    (entry.minLevel and entry.maxLevel) and "Level range sourced from current catalogue research." or "Level range: partially unverified — confirm in game.",
     "Location: " .. tostring(entry.zone or "Unknown") .. " — " .. tostring(entry.continent or ""),
     "Faction: " .. tostring(entry.faction or "Both"),
     "Type: " .. tostring(entry.type or "Dungeon"),
@@ -62,8 +63,16 @@ local function RenderOverview(entry)
 end
 local function RenderMap(entry)
   local map = Tool.data.maps[entry.id]
-  if map and map.image then
-    SetDetailText(entry.name, "DUNGEON MAP", "Map data is registered for this instance. Map asset: " .. tostring(map.image))
+  if map and map.floors and #map.floors > 0 then
+    local lines = {"Map floors: " .. #map.floors, ""}
+    for _, floor in ipairs(map.floors) do
+      lines[#lines+1] = floor.name or "Unnamed floor"
+      if floor.image then lines[#lines+1] = "Map asset: " .. tostring(floor.image) end
+      for _, marker in ipairs(floor.markers or {}) do
+        lines[#lines+1] = string.format("  %s: %s (%.1f%%, %.1f%%)", tostring(marker.kind or "marker"), tostring(marker.label or marker.id or "Unknown"), (marker.x or 0)*100, (marker.y or 0)*100)
+      end
+    end
+    SetDetailText(entry.name, "DUNGEON MAP", table.concat(lines, "\n"))
   else
     SetDetailText(entry.name, "DUNGEON MAP", "A custom dungeon map has not been added yet.\n\nThe map system supports multiple floors, boss markers, entrances, quest-giver pins and objective locations. Maps will be added as original Taverners assets, with pins driven by verified coordinates.")
   end
@@ -122,13 +131,18 @@ local function RefreshList()
       row:SetHighlightTexture("Interface/QuestFrame/UI-QuestTitleHighlight")
       local name = MakeText(row, "OVERLAY", "GameFontNormal", entry.name, 194)
       name:SetPoint("TOPLEFT", 7, -3)
-      local level = MakeText(row, "OVERLAY", "GameFontHighlightSmall", tostring(entry.minLevel) .. "–" .. tostring(entry.maxLevel) .. "  •  " .. tostring(entry.zone), 194)
+      local level = MakeText(row, "OVERLAY", "GameFontHighlightSmall", tostring(entry.minLevel or "?") .. "–" .. tostring(entry.maxLevel or "?") .. "  •  " .. tostring(entry.zone or "Location unknown"), 194)
       level:SetPoint("TOPLEFT", name, "BOTTOMLEFT", 0, -1)
       row:SetScript("OnClick", function() Tool:Select(entry.id) end)
       listContent.rows[#listContent.rows+1] = row
       y = y - 36
     end
   end
+  if #listContent.rows == 0 then
+    local empty = MakeText(listContent, "OVERLAY", "GameFontHighlightSmall", DB.favouritesOnly and "No favourites in this section yet." or "No matching instances.", 190)
+    empty:SetPoint("TOPLEFT", 8, -8)
+    listContent.empty = empty
+  elseif listContent.empty then listContent.empty:Hide(); listContent.empty = nil end
   listContent:SetHeight(math.max(1, -y + 8))
 end
 
@@ -159,9 +173,13 @@ local function CreateWindow()
   searchBox:SetPoint("TOPLEFT", 18, -76)
   searchBox:SetAutoFocus(false)
   searchBox:SetScript("OnTextChanged", RefreshList)
+  typeButton = MakeButton(frame, "Dungeons", 98, 23, function() Tool:ToggleType() end)
+  typeButton:SetPoint("TOPLEFT", 18, -103)
+  favouriteFilterButton = MakeButton(frame, "All", 98, 23, function() Tool:ToggleFavouritesOnly() end)
+  favouriteFilterButton:SetPoint("TOPLEFT", typeButton, "TOPRIGHT", 8, 0)
 
   local scroll = CreateFrame("ScrollFrame", "TavernersDungeonToolListScroll", frame, "UIPanelScrollFrameTemplate")
-  scroll:SetPoint("TOPLEFT", 14, -108)
+  scroll:SetPoint("TOPLEFT", 14, -134)
   scroll:SetPoint("BOTTOMLEFT", 14, 18)
   scroll:SetWidth(228)
   listContent = CreateFrame("Frame", nil, scroll)
@@ -192,6 +210,7 @@ local function CreateWindow()
     if entry then Tool:ToggleFavourite(entry.id) end
   end)
   fav:SetPoint("TOPRIGHT", -12, -12)
+  favouriteButton = fav
 
   detailTitle = MakeText(panel, "OVERLAY", "GameFontNormalLarge", "", 520)
   detailTitle:SetPoint("TOPLEFT", 16, -54)
@@ -204,18 +223,25 @@ local function CreateWindow()
   detailBody:SetSpacing(3)
 
   Tool.UI = {
-    Toggle=function() if frame:IsShown() then frame:Hide() else frame:Show(); RefreshList(); RenderSelected() end end,
-    Refresh=function() RefreshList(); RenderSelected() end,
+    Toggle=function() if frame:IsShown() then frame:Hide() else frame:Show(); Tool.UI:Refresh() end end,
+    Refresh=function()
+      if typeButton then typeButton:SetText(DB.showRaids and "Raids" or "Dungeons") end
+      if favouriteFilterButton then favouriteFilterButton:SetText(DB.favouritesOnly and "Favourites" or "All") end
+      if favouriteButton then
+        local entry = Tool:GetSelected()
+        favouriteButton:SetText(entry and Tool:IsFavourite(entry.id) and "★ Favourited" or "☆ Favourite")
+      end
+      RefreshList()
+      RenderSelected()
+    end,
   }
-  RefreshList()
-  RenderSelected()
+  Tool.UI:Refresh()
   return frame
 end
 
 function Tool.UI:Show()
   CreateWindow():Show()
-  RefreshList()
-  RenderSelected()
+  Tool.UI:Refresh()
 end
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
