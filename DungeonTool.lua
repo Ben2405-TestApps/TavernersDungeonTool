@@ -27,6 +27,22 @@ DB.mapFloorIndex = DB.mapFloorIndex or {}
 local Tool = {db=DB, data=Data, mapData=ns.MapData or {}, selected=nil, tab="overview"}
 ns.Tool = Tool
 
+function Tool:GetDashboardSummary()
+  return tostring(#(Data.dungeons or {})) .. " dungeons • " .. tostring(#(Data.raids or {})) .. " raids indexed"
+end
+function Tool:OpenInstanceByName(name)
+  if not name then return false end
+  local query = tostring(name):lower()
+  for _, entry in ipairs(Data.dungeons or {}) do
+    if entry.name:lower() == query or entry.id == query then
+      self.db.showRaids = false
+      self.db.selectedID = entry.id
+      if self.UI and self.UI.Toggle then self.UI:Toggle() elseif self.UI and self.UI.Refresh then self.UI:Refresh() end
+      return true
+    end
+  end
+  return false
+end
 function Tool:GetEntries()
   local source = Data:GetAll(DB.showRaids and "Raid" or "Dungeon")
   local entries = {}
