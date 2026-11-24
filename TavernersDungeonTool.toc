@@ -2,7 +2,7 @@
 ## Title: Taverners Dungeon Tool
 ## Notes: Interactive dungeon maps, quests, bosses and loot for The Taverners Guild
 ## Author: The Taverners Guild
-## Version: 0.2.1
+## Version: 0.3.0
 ## Dependencies: TavernersCore
 ## SavedVariables: TavernersDungeonToolDB
 
