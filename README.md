@@ -13,7 +13,8 @@ A TavernersCore-powered dungeon journal for World of Warcraft: Forever.
 - Saved selection and tab state
 - Wowhead-sourced quest, boss and loot records for the newer Forever dungeons
 - Interactive tiled dungeon maps for Classic instances using map assets already installed with the game client
-- 288 clickable boss, rare and optional encounter markers across 29 mapped instances
+- 288 clickable boss, rare, optional and quest-target markers across 29 mapped instances
+- Quest pickup locations and entrance waypoints shown alongside each floor map
 - Multi-floor navigation, boss pin tooltips and entrance waypoint details where verified
 - Wowhead guide references retained per instance; third-party custom map artwork is not bundled
 - Data-driven catalogue designed for verified maps, quests, bosses and loot
