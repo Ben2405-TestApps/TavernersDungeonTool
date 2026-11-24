@@ -20,7 +20,7 @@ local Defaults = {
   favourites = {},
   windowScale = 1,
 }
-local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 1)
+local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 2)
 
 local Tool = {db=DB, data=Data, selected=nil, tab="overview"}
 ns.Tool = Tool
