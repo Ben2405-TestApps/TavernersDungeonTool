@@ -60,6 +60,8 @@ local function RenderOverview(entry)
     "Bosses indexed: " .. bossCount,
     "",
     "Taverners tip: check the Quests and Map tabs before forming your group.",
+    "",
+    entry.wowheadGuide and ("Wowhead guide: " .. entry.wowheadGuide) or "Wowhead guide: not indexed",
   }
   SetDetailText(entry.name, "OVERVIEW", table.concat(lines, "\n"))
 end
@@ -76,7 +78,7 @@ local function RenderMap(entry)
     end
     SetDetailText(entry.name, "DUNGEON MAP", table.concat(lines, "\n"))
   else
-    SetDetailText(entry.name, "DUNGEON MAP", "A custom dungeon map has not been added yet.\n\nThe map system supports multiple floors, boss markers, entrances, quest-giver pins and objective locations. Maps will be added as original Taverners assets, with pins driven by verified coordinates.")
+    SetDetailText(entry.name, "DUNGEON MAP", "A local map asset has not been added yet.\n\nWowhead has an illustrated map or dungeon journal where available. We are linking to the source rather than copying its copyrighted artwork.\n\n" .. (entry.wowheadGuide or "No Wowhead guide indexed yet.") .. "\n\nThe local map system supports multiple floors, boss markers, entrances, quest-giver pins and objective locations.")
   end
 end
 local function RenderQuests(entry)
@@ -87,9 +89,13 @@ local function RenderQuests(entry)
   end
   local lines = {}
   for _, q in ipairs(quests) do
-    lines[#lines+1] = (q.name or "Unnamed quest") .. " — level " .. tostring(q.level or "?")
-    lines[#lines+1] = "  Giver: " .. tostring(q.giver or "Unknown")
-    lines[#lines+1] = "  Objective: " .. tostring(q.objective or "See quest details")
+    lines[#lines+1] = (q.name or "Unnamed quest") .. " — level " .. tostring(q.level or "?") .. (q.secret and " [SECRET]" or "")
+    lines[#lines+1] = "  Faction: " .. tostring(q.faction or "Both / unconfirmed")
+    lines[#lines+1] = "  Giver: " .. tostring(q.giver or "See Wowhead guide")
+    if q.giverLocation then lines[#lines+1] = "  Location: " .. q.giverLocation end
+    if q.coordinates then lines[#lines+1] = "  Coordinates: " .. q.coordinates end
+    if q.objective then lines[#lines+1] = "  Objective: " .. q.objective end
+    if q.prerequisites then lines[#lines+1] = "  Prerequisites: " .. q.prerequisites end
     lines[#lines+1] = ""
   end
   SetDetailText(entry.name, "DUNGEON QUESTS", table.concat(lines, "\n"))
@@ -102,8 +108,8 @@ local function RenderBosses(entry)
   end
   local lines = {}
   for _, boss in ipairs(bosses) do
-    lines[#lines+1] = boss.name or "Unknown boss"
-    lines[#lines+1] = "  " .. tostring(boss.notes or "Encounter notes coming soon.")
+    lines[#lines+1] = (boss.name or "Unknown boss") .. (boss.rare and " [RARE]" or "")
+    lines[#lines+1] = "  " .. tostring(boss.notes or "Encounter notes not yet indexed.")
     for _, item in ipairs(boss.loot or {}) do lines[#lines+1] = "  • " .. tostring(item.name or item.itemID) end
     lines[#lines+1] = ""
   end
