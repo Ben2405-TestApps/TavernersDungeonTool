@@ -22,7 +22,7 @@ local Defaults = {
   mapFloorIndex = {},
 }
 local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 4)
-Core.Settings:Register("DungeonTool", DB, {showRaids={label="Show raids in catalogue",type="boolean",default=false}, favouritesOnly={label="Show favourites only",type="boolean",default=false}, windowScale={label="Window scale",type="number",default=1,min=0.75,max=1.25,step=0.05}})
+Core.Settings:Register("DungeonTool", DB, {showRaids={label="Show raids in catalogue",type="boolean",default=false}, favouritesOnly={label="Show favourites only",type="boolean",default=false}})
 
 DB.mapFloorIndex = DB.mapFloorIndex or {}
 local Tool = {db=DB, data=Data, mapData=ns.MapData or {}, selected=nil, tab="overview"}
