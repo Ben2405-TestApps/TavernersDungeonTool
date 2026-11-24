@@ -65,4 +65,4 @@ The current Forever data pass uses Wowhead's Forever-specific pages, including:
 - https://www.wowhead.com/forever/guide/blackmaw-hold-dungeon-overview-location-rewards
 - https://www.wowhead.com/forever/guide/the-shapers-terrace-dungeon-overview-location-rewards
 
-Wowhead map artwork is not bundled into this addon. The project stores source references and original map data only; any map assets added later will be created independently or used with permission.
+The project stores source references and map metadata. Floor IDs, client tile references and route marker coordinates are adapted from ForeverDungeonRoutes by Checkov23 under the MIT License; the required notice is in `LICENSES/ForeverDungeonRoutes-MIT.txt`. Blizzard map art is loaded from the installed client and is not redistributed. Santiago Reyes custom maps are not bundled.
