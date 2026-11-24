@@ -12,7 +12,8 @@ A TavernersCore-powered dungeon journal for World of Warcraft: Forever.
 - Favourite instance storage with a dedicated filter
 - Saved selection and tab state
 - Wowhead-sourced quest, boss and loot records for the newer Forever dungeons
-- Merges the Quest Companion's curated dungeon quest index into the journal's Quests and Map views when both addons are enabled
+- Merges the Quest Companion's curated dungeon quest index into the journal's Quests and Map views when both addons are enabled, deduplicating repeated quest records.
+- Exposes a quest-giver stop list for instance quest routes when coordinates are present.
 - Interactive multi-floor dungeon maps for Classic and new Forever instances, assembled from minimap tiles already installed with the game client
 - 288 clickable boss, rare, optional and quest-target markers across 29 mapped instances
 - Quest pickup locations and entrance waypoints shown alongside each floor map
