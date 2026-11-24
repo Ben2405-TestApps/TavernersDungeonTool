@@ -12,6 +12,7 @@ local selectedID
 local frame, listContent, detailTitle, detailSub, detailBody, searchBox, tabButtons, typeButton, favouriteFilterButton, favouriteButton = nil, nil, nil, nil, nil, nil, {}, nil, nil, nil
 local mapContainer, mapCanvas, mapFloorLabel, mapPrevButton, mapNextButton, mapSideText, mapInfo, mapPlaceholder
 local mapMarkerButtons, mapTileTextures = {}, {}
+local RenderMap
 
 local function CreateBackdrop(target)
   if not target.SetBackdrop then return end
@@ -114,7 +115,7 @@ local function CreateMapPanel(panel)
   mapInfo:SetJustifyV("TOP")
 end
 
-local function RenderMap(entry)
+RenderMap = function(entry)
   if not mapContainer then return end
   detailBody:Hide()
   mapContainer:Show()
