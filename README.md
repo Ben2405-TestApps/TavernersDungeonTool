@@ -75,3 +75,8 @@ The current Forever data pass uses Wowhead's Forever-specific pages, including:
 - https://www.wowhead.com/forever/guide/dungeons/every-dungeon-quest-location
 
 The project stores source references and map metadata. Floor IDs, client tile references and route marker coordinates are adapted from ForeverDungeonRoutes by Checkov23 under the MIT License; the required notice is in `LICENSES/ForeverDungeonRoutes-MIT.txt`. Blizzard map art is loaded from the installed client and is not redistributed. Santiago Reyes custom maps are not bundled.
+
+
+## Shared settings (0.3.0)
+
+Dungeon Tool registers its raid visibility, favourites-only filter and window scale preferences with TavernersCore for the shared `/tsettings` panel. Existing dungeon quest, map and checklist data remains in this addon.
