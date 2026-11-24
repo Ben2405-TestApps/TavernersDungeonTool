@@ -100,7 +100,7 @@ local function CreateMapPanel(panel)
   mapCanvas:SetSize(350, 264)
   mapCanvas:SetPoint("TOPLEFT", 0, -32)
   CreateBackdrop(mapCanvas)
-  mapCanvas:SetBackdropColor(0.10, 0.09, 0.07, 1)
+  if mapCanvas.SetBackdropColor then mapCanvas:SetBackdropColor(0.10, 0.09, 0.07, 1) end
   mapPlaceholder = MakeText(mapCanvas, "OVERLAY", "GameFontHighlightSmall", "", 300)
   mapPlaceholder:SetPoint("CENTER")
   mapPlaceholder:SetJustifyH("CENTER")
@@ -173,7 +173,7 @@ RenderMap = function(entry)
   for i, marker in ipairs(markers) do
     if marker.kind == "boss" then bossNumber = bossNumber + 1 end
     local label = marker.kind == "quest" and "Q" or (marker.kind == "rare" and "R" or (marker.kind == "optional" and "+" or tostring(bossNumber)))
-    if i <= 14 then lines[#lines+1] = label .. "  " .. tostring(marker.name) end
+    if i <= 8 then lines[#lines+1] = label .. "  " .. tostring(marker.name) end
     local pin = MakeButton(mapCanvas, label, 24, 22, function()
       local note = marker.note
       for _, boss in ipairs(Tool:GetBosses(entry.id)) do
@@ -192,16 +192,16 @@ RenderMap = function(entry)
     mapMarkerButtons[#mapMarkerButtons+1] = pin
   end
   if #markers == 0 then lines[#lines+1] = "No boss pins on this floor yet."
-  elseif #markers > 14 then lines[#lines+1] = "... and " .. (#markers - 14) .. " more pins on the map." end
+  elseif #markers > 8 then lines[#lines+1] = "... and " .. (#markers - 8) .. " more pins on the map." end
   lines[#lines+1] = ""
   local quests = Tool:GetQuests(entry.id)
   if #quests > 0 then
     lines[#lines+1] = ""
     lines[#lines+1] = "|cffffd27aQUEST STARTS|r"
     for qIndex, quest in ipairs(quests) do
-      if qIndex <= 4 then lines[#lines+1] = tostring(quest.name) .. " — " .. tostring(quest.giverLocation or quest.giver or "See guide") end
+      if qIndex <= 3 then lines[#lines+1] = tostring(quest.name) .. " — " .. tostring(quest.giverLocation or quest.giver or "See guide") end
     end
-    if #quests > 4 then lines[#lines+1] = "... and " .. (#quests - 4) .. " more quests" end
+    if #quests > 3 then lines[#lines+1] = "... and " .. (#quests - 3) .. " more quests" end
   end
   if map.entrance then
     lines[#lines+1] = ""
