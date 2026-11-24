@@ -123,7 +123,7 @@ function Tool:GetQuests(id)
   local entry = Data:GetByID(id)
   local companion = Core.modules and Core.modules.QuestCompanion
   if entry and companion and companion.GetDungeonQuests then
-    for _,q in ipairs(companion:GetDungeonQuests(entry.name)) do
+    for _,q in ipairs(companion:GetDungeonQuests(entry.name, DB.selectedTab=="quests" or DB.selectedTab=="map")) do
       add({name=q.name,level=q.level,faction=q.faction,giver=q.giver,
         giverLocation=q.location,coordinates=q.coords,prerequisites=q.prerequisite,
         objective=q.objective,source="Quest Companion curated index"},"Quest Companion")
