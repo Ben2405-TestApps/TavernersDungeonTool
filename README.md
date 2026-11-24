@@ -31,7 +31,7 @@ Enable both addons. TavernersCore must be enabled.
 
 The catalogue is kept separate from the interface in `DungeonData.lua`. This allows maps, quests, boss records and loot to be added without rewriting the UI.
 
-The first catalogue is a starting index of classic instances. Empty map, quest, boss and loot datasets are intentional: coordinates, quest prerequisites, reward data and drop information should be verified against WoW Forever rather than copied or guessed. Forever-specific instances will be added as their names, levels and layouts are confirmed.
+The catalogue includes the classic instance list plus identified WoW Forever additions. Some newer entries have incomplete level or location data; these fields are intentionally marked unknown until verified. Empty map, quest, boss and loot datasets are intentional: coordinates, quest prerequisites, reward data and drop information should be verified against WoW Forever rather than copied or guessed.
 
 ## Data and roadmap
 
