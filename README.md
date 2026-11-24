@@ -2,13 +2,14 @@
 
 A TavernersCore-powered dungeon journal for World of Warcraft: Forever.
 
-## Features in the foundation release
+## Features
 
 - TavernersCore dependency and shared gold/parchment visual identity
-- Searchable dungeon and raid catalogue
+- Searchable dungeon and raid catalogue, including the known newer WoW Forever instances
+- Dungeons / Raids switch and All / Favourites filter
 - Instance overview with level range, location, continent and faction
 - Dedicated Overview, Map, Quests and Bosses & Loot sections
-- Favourite instance storage
+- Favourite instance storage with a dedicated filter
 - Saved selection and tab state
 - Data-driven catalogue designed for verified maps, quests, bosses and loot
 
@@ -32,16 +33,14 @@ The catalogue is kept separate from the interface in `DungeonData.lua`. This all
 
 The first catalogue is a starting index of classic instances. Empty map, quest, boss and loot datasets are intentional: coordinates, quest prerequisites, reward data and drop information should be verified against WoW Forever rather than copied or guessed. Forever-specific instances will be added as their names, levels and layouts are confirmed.
 
-## Planned development
+## Data and roadmap
 
-1. Verified instance catalogue, including Forever-specific dungeons and raids
-2. Original map assets for every dungeon, including multi-floor maps
-3. Boss pins, entrance/exit pins, quest givers and objective markers
-4. Full quest chains, prerequisites, faction/race filters, rewards and quest-log status
-5. Boss encounter notes, loot tables, item tooltips and class/profession filters
-6. Search across instances, bosses, items, quests and NPCs
-7. Group preparation checklist, favourites and saved loot/quest targets
-8. TavernersCore diagnostics and dependency reporting
+- Forever-specific catalogue entries are included where identified. Unknown level ranges, locations and entrances are deliberately left unverified.
+- The map schema supports multiple floors and normalized marker coordinates for bosses, entrances, quest givers and objectives. No invented coordinates or placeholder artwork are presented as real maps.
+- Quest, boss and loot records remain data-driven and will be populated from verifiable Forever sources and in-game checks.
+- Next content pass: original floor-map artwork, verified entrance and boss pins, quest chains and rewards, boss encounter notes and loot tables.
+- Later enhancements: class/profession loot filters, quest-log status, group preparation checklist and saved loot/quest targets.
+- TavernersCore diagnostics and dependency reporting remain part of the shared addon foundation.
 
 ## Compatibility and testing
 
