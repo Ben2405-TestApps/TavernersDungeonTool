@@ -28,6 +28,18 @@ ns.Data = {
     {id="dire_maul", name="Dire Maul", minLevel=54, maxLevel=60, zone="Feralas", continent="Kalimdor", faction="Both", type="Dungeon", description="The ruined Highborne city in Feralas."},
     {id="scholomance", name="Scholomance", minLevel=58, maxLevel=60, zone="Western Plaguelands", continent="Eastern Kingdoms", faction="Both", type="Dungeon", description="A dark academy hidden in Caer Darrow."},
     {id="stratholme", name="Stratholme", minLevel=55, maxLevel=60, zone="Eastern Plaguelands", continent="Eastern Kingdoms", faction="Both", type="Dungeon", description="A ruined city divided between living and undead forces."},
+
+    -- WoW Forever additions. Only ranges supported by current public client/API
+    -- research are populated; unknown fields intentionally remain nil.
+    {id="hall_of_thanes", name="The Hall of Thanes", minLevel=13, maxLevel=20, zone="Unknown", continent="Unknown", faction="Both", type="Dungeon", description="A newer WoW Forever dungeon. Entrance and detailed level data require in-game confirmation."},
+    {id="ruins_of_lordaeron", name="Ruins of Lordaeron", minLevel=15, zone="Tirisfal Glades", continent="Eastern Kingdoms", faction="Both", type="Dungeon", description="A WoW Forever dungeon in the ruins of Lordaeron. Maximum level and entrance details require confirmation."},
+    {id="excavation_site", name="Excavation Site", minLevel=26, zone="Wetlands", continent="Eastern Kingdoms", faction="Both", type="Dungeon", description="A WoW Forever dungeon in the Wetlands. Maximum level and entrance details require confirmation."},
+    {id="city_of_dalaran", name="City of Dalaran", minLevel=28, zone="Alterac Mountains", continent="Eastern Kingdoms", faction="Both", type="Dungeon", description="A WoW Forever dungeon associated with Dalaran. Maximum level and entrance details require confirmation."},
+    {id="drowned_city", name="The Drowned City", minLevel=35, maxLevel=42, zone="Unknown", continent="Unknown", faction="Both", type="Dungeon", description="A newer WoW Forever dungeon. Exact entrance and zone details require in-game confirmation."},
+    {id="kroldok_stronghold", name="Krol'dok Stronghold", minLevel=40, maxLevel=47, zone="Unknown", continent="Unknown", faction="Both", type="Dungeon", description="A newer WoW Forever dungeon. Exact entrance and zone details require in-game confirmation."},
+    {id="alcaz_prison", name="Alcaz Prison", minLevel=48, maxLevel=55, zone="Alcaz Island", continent="Kalimdor", faction="Both", type="Dungeon", description="A newer WoW Forever dungeon. Exact entrance details require in-game confirmation."},
+    {id="blackmaw_hold", name="Blackmaw Hold", minLevel=55, maxLevel=60, zone="Unknown", continent="Unknown", faction="Both", type="Dungeon", description="A newer WoW Forever dungeon. Exact entrance and zone details require in-game confirmation."},
+    {id="shapers_terrace", name="The Shaper's Terrace", minLevel=58, maxLevel=60, zone="Unknown", continent="Unknown", faction="Both", type="Dungeon", description="A newer WoW Forever dungeon. Exact entrance and zone details require in-game confirmation."},
   },
   raids = {
     {id="onyxias_lair", name="Onyxia's Lair", minLevel=60, maxLevel=60, zone="Dustwallow Marsh", continent="Kalimdor", faction="Both", type="Raid", description="The lair of the Broodmother."},
@@ -43,6 +55,11 @@ ns.Data = {
   bosses = {},
   maps = {},
   loot = {},
+  -- Map records use normalized 0-1 coordinates. Add only after in-game verification.
+  -- Example: maps[id] = { floors = { { name="Upper", image="Maps/...", markers={
+  --   {kind="boss", id="boss_key", label="Boss", x=0.42, y=0.31}
+  -- } } } }
+
 }
 
 function ns.Data:GetAll(kind)
