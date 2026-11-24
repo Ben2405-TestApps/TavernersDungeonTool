@@ -217,11 +217,6 @@ function Tool.UI:Show()
   RefreshList()
   RenderSelected()
 end
-SLASH_TAVERNERSDUNGEONTOOLSHOW1 = "/tdungeon"
-SLASH_TAVERNERSDUNGEONTOOLSHOW2 = "/tdt"
-SlashCmdList = SlashCmdList or {}
-SlashCmdList.TAVERNERSDUNGEONTOOLSHOW = function() CreateWindow():Show(); RefreshList(); RenderSelected() end
-
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:SetScript("OnEvent", function()
