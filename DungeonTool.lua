@@ -20,6 +20,7 @@ local Defaults = {
   favourites = {},
   windowScale = 1,
   mapFloorIndex = {},
+  prepChecklist = {},
 }
 local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 4)
 Core.Settings:Register("DungeonTool", DB, {showRaids={label="Show raids in catalogue",type="boolean",default=false}, favouritesOnly={label="Show favourites only",type="boolean",default=false}})
@@ -154,6 +155,37 @@ function Tool:GetQuestGiverStops(id)
   return stops
 end
 function Tool:GetMapData(id) return self.mapData[id] end
+
+Tool.PrepItems = {
+  {id="repair", label="Repair gear and check durability", detail="Repair before entering; a broken weapon or armour piece can ruin a run."},
+  {id="bags", label="Free bag space", detail="Make room for quest items, greens, crafting materials and boss loot."},
+  {id="quests", label="Pick up dungeon quests", detail="Check the Quests tab for faction, level and prerequisite requirements."},
+  {id="roles", label="Confirm group roles", detail="Agree who is tanking, healing, interrupting and handling crowd control."},
+  {id="consumables", label="Bring consumables", detail="Bring suitable food, water, potions, bandages and class reagents."},
+  {id="ammo", label="Check ammunition and pet supplies", detail="Hunters should check arrows or bullets, quiver space and pet happiness."},
+  {id="loot", label="Agree loot rules and targets", detail="Discuss need/greed, reserved items and profession recipes before the first boss."},
+  {id="route", label="Review map, entrance and boss order", detail="Use the Map and Bosses & Loot tabs to familiarise the group with the route."},
+}
+function Tool:GetPrepChecklist(id)
+  self.db.prepChecklist = self.db.prepChecklist or {}
+  self.db.prepChecklist[id] = self.db.prepChecklist[id] or {}
+  return self.db.prepChecklist[id]
+end
+function Tool:SetPrepItem(id, itemID, checked)
+  local valid = false
+  for _, item in ipairs(self.PrepItems) do if item.id == itemID then valid = true; break end end
+  if not valid or not Data:GetByID(id) then return false end
+  local checklist = self:GetPrepChecklist(id)
+  checklist[itemID] = checked and true or nil
+  if Core.Events then Core.Events:Emit("DUNGEON_PREP_CHANGED", id, itemID, checked and true or false) end
+  return true
+end
+function Tool:ResetPrepChecklist(id)
+  if not Data:GetByID(id) then return false end
+  self.db.prepChecklist = self.db.prepChecklist or {}
+  self.db.prepChecklist[id] = {}
+  return true
+end
 function Tool:GetBosses(id)
   local result = {}
   for _, boss in ipairs(Data.bosses or {}) do
