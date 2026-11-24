@@ -125,8 +125,9 @@ function Tool:GetQuests(id)
   if entry and companion and companion.GetDungeonQuests then
     for _,q in ipairs(companion:GetDungeonQuests(entry.name, DB.selectedTab=="quests" or DB.selectedTab=="map")) do
       add({name=q.name,level=q.level,faction=q.faction,giver=q.giver,
-        giverLocation=q.location,coordinates=q.coords,prerequisites=q.prerequisite,
-        objective=q.objective,source="Quest Companion curated index"},"Quest Companion")
+        giverLocation=q.giverLocation or q.location,coordinates=q.coordinates or q.coords,
+        prerequisites=q.prerequisites or q.prerequisite,objective=q.objective,
+        questID=q.questID,source=q.source or "Quest Companion curated index"},"Quest Companion")
     end
   end
   table.sort(result,function(a,b)
