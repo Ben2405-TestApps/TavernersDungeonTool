@@ -80,3 +80,18 @@ The project stores source references and map metadata. Floor IDs, client tile re
 ## Shared settings (0.3.0)
 
 Dungeon Tool registers its raid visibility, favourites-only filter and window scale preferences with TavernersCore for the shared `/tsettings` panel. Existing dungeon quest, map and checklist data remains in this addon.
+
+
+## Group preparation checklist (0.4.0)
+
+The instance journal now includes a **Group Prep** tab with a saved checklist for each dungeon or raid:
+- Repair gear and check durability
+- Free bag space
+- Pick up dungeon quests and check prerequisites
+- Confirm tank, healer, damage, interrupt and crowd-control roles
+- Bring suitable consumables, food, water, potions, bandages and class reagents
+- Check hunter ammunition, quiver space and pet happiness
+- Agree loot rules and target items
+- Review the instance map, entrance and boss order
+
+Checklist progress is stored locally per character and per instance. Use Reset checklist to clear the selected instance's preparation state. This is a planning aid, not an automatic group-readiness check.
