@@ -11,6 +11,7 @@ local gold = theme.gold or {0.88, 0.68, 0.28}
 local selectedID
 local frame, listContent, detailTitle, detailSub, detailBody, searchBox, tabButtons, typeButton, favouriteFilterButton, favouriteButton = nil, nil, nil, nil, nil, nil, {}, nil, nil, nil
 local mapContainer, mapCanvas, mapFloorLabel, mapPrevButton, mapNextButton, mapSideText, mapInfo, mapPlaceholder
+local prepContainer
 local mapMarkerButtons, mapTileTextures = {}, {}
 local RenderMap
 
@@ -245,6 +246,38 @@ local function RenderQuests(entry)
   end
   SetDetailText(entry.name, "DUNGEON QUESTS", table.concat(lines, "\n"))
 end
+local function RenderPrep(entry)
+  if not prepContainer then return end
+  for _, row in ipairs(prepContainer.rows or {}) do row:Hide(); row:SetParent(nil) end
+  prepContainer.rows = {}
+  local checklist = Tool:GetPrepChecklist(entry.id)
+  local completed, total = 0, #Tool.PrepItems
+  for _, item in ipairs(Tool.PrepItems) do if checklist[item.id] then completed = completed + 1 end end
+  local progress = MakeText(prepContainer, "OVERLAY", "GameFontNormal", "GROUP READINESS  •  " .. completed .. "/" .. total .. " complete", 430)
+  progress:SetPoint("TOPLEFT", 8, -8)
+  prepContainer.rows[#prepContainer.rows + 1] = progress
+  local y = -38
+  for _, item in ipairs(Tool.PrepItems) do
+    local check = CreateFrame("CheckButton", nil, prepContainer, "UICheckButtonTemplate")
+    check:SetPoint("TOPLEFT", 4, y)
+    check:SetSize(26, 26)
+    check:SetChecked(checklist[item.id] and true or false)
+    local label = MakeText(prepContainer, "OVERLAY", "GameFontNormal", item.label, 475)
+    label:SetPoint("TOPLEFT", 38, y - 1)
+    local detail = MakeText(prepContainer, "OVERLAY", "GameFontHighlightSmall", item.detail, 475)
+    detail:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -1)
+    check:SetScript("OnClick", function(button)
+      Tool:SetPrepItem(entry.id, item.id, button:GetChecked() and true or false)
+      RenderPrep(entry)
+    end)
+    prepContainer.rows[#prepContainer.rows + 1] = check
+    prepContainer.rows[#prepContainer.rows + 1] = label
+    prepContainer.rows[#prepContainer.rows + 1] = detail
+    y = y - 52
+  end
+  if prepContainer.resetButton then prepContainer.resetButton:Show() end
+end
+
 local function RenderBosses(entry)
   local bosses = Tool:GetBosses(entry.id)
   if #bosses == 0 then
@@ -265,13 +298,22 @@ local function RenderSelected()
   if not entry then SetDetailText("No instance selected", "", "Select a dungeon from the list."); return end
   selectedID = entry.id
   local tab = Tool.db.selectedTab or "overview"
-  if tab == "map" then RenderMap(entry)
+  if tab == "map" then
+    if prepContainer then prepContainer:Hide() end
+    RenderMap(entry)
   else
     if mapContainer then mapContainer:Hide() end
-    detailBody:Show()
-    if tab == "quests" then RenderQuests(entry)
-    elseif tab == "bosses" then RenderBosses(entry)
-    else RenderOverview(entry) end
+    if tab == "prep" then
+      detailBody:Hide()
+      if prepContainer then prepContainer:Show() end
+      RenderPrep(entry)
+    else
+      if prepContainer then prepContainer:Hide() end
+      detailBody:Show()
+      if tab == "quests" then RenderQuests(entry)
+      elseif tab == "bosses" then RenderBosses(entry)
+      else RenderOverview(entry) end
+    end
   end
 end
 
@@ -354,13 +396,14 @@ local function CreateWindow()
     {id="map", label="Map"},
     {id="quests", label="Quests"},
     {id="bosses", label="Bosses & Loot"},
+    {id="prep", label="Group Prep"},
   }
   local x = 12
   for _, tab in ipairs(tabs) do
     local b = MakeButton(panel, tab.label, tab.id=="bosses" and 115 or 88, 25, function() Tool:SetTab(tab.id) end)
     b:SetPoint("TOPLEFT", x, -12)
     tabButtons[tab.id] = b
-    x = x + (tab.id=="bosses" and 121 or 94)
+    x = x + (tab.id=="bosses" and 121 or (tab.id=="prep" and 98 or 94))
   end
   local fav = MakeButton(panel, "☆ Favourite", 100, 25, function()
     local entry = Tool:GetSelected()
@@ -378,6 +421,16 @@ local function CreateWindow()
   detailBody:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -16, 16)
   detailBody:SetJustifyV("TOP")
   detailBody:SetSpacing(3)
+  prepContainer = CreateFrame("Frame", nil, panel)
+  prepContainer:SetPoint("TOPLEFT", detailSub, "BOTTOMLEFT", 0, -12)
+  prepContainer:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -14, 14)
+  prepContainer.rows = {}
+  prepContainer.resetButton = MakeButton(prepContainer, "Reset checklist", 112, 22, function()
+    local entry = Tool:GetSelected()
+    if entry then Tool:ResetPrepChecklist(entry.id); RenderPrep(entry) end
+  end)
+  prepContainer.resetButton:SetPoint("TOPRIGHT", -8, -4)
+  prepContainer:Hide()
   CreateMapPanel(panel)
 
   Tool.UI = {
