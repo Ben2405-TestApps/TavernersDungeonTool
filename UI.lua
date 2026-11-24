@@ -126,7 +126,7 @@ local function RefreshList()
   local query = searchBox and searchBox:GetText():lower() or ""
   local y = -2
   for _, entry in ipairs(entries) do
-    if query == "" or entry.name:lower():find(query,1,true) or (entry.zone or ""):lower():find(query,1,true) then
+    if query == "" or entry.name:lower():find(query,1,true) or (entry.zone or ""):lower():find(query,1,true) or (entry.continent or ""):lower():find(query,1,true) then
       local row = CreateFrame("Button", nil, listContent)
       row:SetSize(208, 34)
       row:SetPoint("TOPLEFT", 2, y)
