@@ -10,6 +10,8 @@ local theme = Core.Theme or {}
 local gold = theme.gold or {0.88, 0.68, 0.28}
 local selectedID
 local frame, listContent, detailTitle, detailSub, detailBody, searchBox, tabButtons, typeButton, favouriteFilterButton, favouriteButton = nil, nil, nil, nil, nil, nil, {}, nil, nil, nil
+local mapContainer, mapCanvas, mapFloorLabel, mapPrevButton, mapNextButton, mapSideText, mapInfo, mapPlaceholder
+local mapMarkerButtons, mapTileTextures = {}, {}
 
 local function CreateBackdrop(target)
   if not target.SetBackdrop then return end
@@ -65,21 +67,138 @@ local function RenderOverview(entry)
   }
   SetDetailText(entry.name, "OVERVIEW", table.concat(lines, "\n"))
 end
+local function CreateMapPanel(panel)
+  mapContainer = CreateFrame("Frame", nil, panel)
+  mapContainer:SetPoint("TOPLEFT", detailSub, "BOTTOMLEFT", 0, -10)
+  mapContainer:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -14, 14)
+
+  mapPrevButton = MakeButton(mapContainer, "<", 28, 22, function()
+    local entry = Tool:GetSelected()
+    if not entry then return end
+    local map = Tool:GetMapData(entry.id)
+    local count = map and map.floors and #map.floors or 0
+    if count < 2 then return end
+    DB.mapFloorIndex[entry.id] = math.max(1, (DB.mapFloorIndex[entry.id] or 1) - 1)
+    RenderMap(entry)
+  end)
+  mapPrevButton:SetPoint("TOPLEFT", 0, 0)
+  mapNextButton = MakeButton(mapContainer, ">", 28, 22, function()
+    local entry = Tool:GetSelected()
+    if not entry then return end
+    local map = Tool:GetMapData(entry.id)
+    local count = map and map.floors and #map.floors or 0
+    if count < 2 then return end
+    DB.mapFloorIndex[entry.id] = math.min(count, (DB.mapFloorIndex[entry.id] or 1) + 1)
+    RenderMap(entry)
+  end)
+  mapNextButton:SetPoint("TOPLEFT", mapPrevButton, "TOPRIGHT", 5, 0)
+  mapFloorLabel = MakeText(mapContainer, "OVERLAY", "GameFontNormal", "FLOOR", 260)
+  mapFloorLabel:SetPoint("LEFT", mapNextButton, "RIGHT", 10, 0)
+
+  mapCanvas = CreateFrame("Frame", nil, mapContainer)
+  mapCanvas:SetSize(350, 264)
+  mapCanvas:SetPoint("TOPLEFT", 0, -32)
+  CreateBackdrop(mapCanvas)
+  mapCanvas:SetBackdropColor(0.10, 0.09, 0.07, 1)
+  mapPlaceholder = MakeText(mapCanvas, "OVERLAY", "GameFontHighlightSmall", "", 300)
+  mapPlaceholder:SetPoint("CENTER")
+  mapPlaceholder:SetJustifyH("CENTER")
+
+  mapSideText = MakeText(mapContainer, "OVERLAY", "GameFontHighlightSmall", "", 165)
+  mapSideText:SetPoint("TOPLEFT", mapCanvas, "TOPRIGHT", 12, 0)
+  mapSideText:SetJustifyV("TOP")
+
+  mapInfo = MakeText(mapContainer, "OVERLAY", "GameFontHighlight", "", 520)
+  mapInfo:SetPoint("TOPLEFT", mapCanvas, "BOTTOMLEFT", 0, -10)
+  mapInfo:SetHeight(74)
+  mapInfo:SetJustifyV("TOP")
+end
+
 local function RenderMap(entry)
-  local map = Tool.data.maps[entry.id]
-  if map and map.floors and #map.floors > 0 then
-    local lines = {"Map floors: " .. #map.floors, ""}
-    for _, floor in ipairs(map.floors) do
-      lines[#lines+1] = floor.name or "Unnamed floor"
-      if floor.image then lines[#lines+1] = "Map asset: " .. tostring(floor.image) end
-      for _, marker in ipairs(floor.markers or {}) do
-        lines[#lines+1] = string.format("  %s: %s (%.1f%%, %.1f%%)", tostring(marker.kind or "marker"), tostring(marker.label or marker.id or "Unknown"), (marker.x or 0)*100, (marker.y or 0)*100)
-      end
-    end
-    SetDetailText(entry.name, "DUNGEON MAP", table.concat(lines, "\n"))
-  else
-    SetDetailText(entry.name, "DUNGEON MAP", "A local map asset has not been added yet.\n\nWowhead has an illustrated map or dungeon journal where available. We are linking to the source rather than copying its copyrighted artwork.\n\n" .. (entry.wowheadGuide or "No Wowhead guide indexed yet.") .. "\n\nThe local map system supports multiple floors, boss markers, entrances, quest-giver pins and objective locations.")
+  if not mapContainer then return end
+  detailBody:Hide()
+  mapContainer:Show()
+  SetDetailText(entry.name, "INTERACTIVE DUNGEON MAP", "")
+  for _, texture in ipairs(mapTileTextures) do texture:Hide() end
+  for _, button in ipairs(mapMarkerButtons) do button:Hide() end
+  mapTileTextures, mapMarkerButtons = {}, {}
+
+  local map = Tool:GetMapData(entry.id)
+  local floors = map and map.floors or {}
+  if #floors == 0 then
+    mapFloorLabel:SetText("MAP DATA NOT AVAILABLE")
+    mapPrevButton:Disable(); mapNextButton:Disable()
+    mapPlaceholder:SetText("No verified floor map is indexed for this instance yet.\n\nOpen the Wowhead guide for its map and location.")
+    mapPlaceholder:Show()
+    mapSideText:SetText(entry.wowheadGuide or "No guide link available.")
+    mapInfo:SetText("Map data is being expanded as verified floor layouts and coordinates become available.")
+    return
   end
+
+  local index = DB.mapFloorIndex[entry.id] or 1
+  index = math.max(1, math.min(index, #floors))
+  DB.mapFloorIndex[entry.id] = index
+  local floor = floors[index]
+  mapFloorLabel:SetText((floor.name or "Dungeon Floor") .. "  (" .. index .. "/" .. #floors .. ")")
+  mapPrevButton:SetEnabled(index > 1)
+  mapNextButton:SetEnabled(index < #floors)
+
+  local canvasWidth, canvasHeight = 350, 264
+  if floor.tiles and #floor.tiles == 12 then
+    mapPlaceholder:Hide()
+    local tileWidth, tileHeight = canvasWidth / 4, canvasHeight / 3
+    for i, fileID in ipairs(floor.tiles) do
+      local texture = mapCanvas:CreateTexture(nil, "ARTWORK")
+      texture:SetTexture(fileID)
+      local column = (i - 1) % 4
+      local row = math.floor((i - 1) / 4)
+      texture:SetSize(tileWidth, tileHeight)
+      texture:SetPoint("TOPLEFT", mapCanvas, "TOPLEFT", column * tileWidth, -row * tileHeight)
+      mapTileTextures[#mapTileTextures+1] = texture
+    end
+  else
+    mapPlaceholder:SetText("A custom floor image is not bundled for this level.\n\nVerified boss positions are still shown on this schematic map.")
+    mapPlaceholder:Show()
+  end
+
+  local markers = {}
+  for _, marker in ipairs(map.markers or {}) do
+    if marker.floor == floor.id and marker.x >= 0 and marker.x <= 1 and marker.y >= 0 and marker.y <= 1 then
+      markers[#markers+1] = marker
+    end
+  end
+  local lines = {"|cffffd27aMAP MARKERS|r", ""}
+  local bossNumber = 0
+  for i, marker in ipairs(markers) do
+    if marker.kind == "boss" then bossNumber = bossNumber + 1 end
+    local label = marker.kind == "rare" and "R" or (marker.kind == "optional" and "+" or tostring(bossNumber))
+    lines[#lines+1] = label .. "  " .. tostring(marker.name)
+    local pin = MakeButton(mapCanvas, label, 24, 22, function()
+      local note = marker.note
+      for _, boss in ipairs(Tool:GetBosses(entry.id)) do
+        if boss.name == marker.name and boss.notes then note = boss.notes; break end
+      end
+      mapInfo:SetText(marker.name .. "  [" .. tostring(marker.kind or "marker") .. "]\n" .. tostring(note or "Location pin from the shared Forever dungeon route dataset."))
+    end)
+    pin:SetSize(24, 22)
+    pin:SetPoint("CENTER", mapCanvas, "TOPLEFT", marker.x * canvasWidth, -marker.y * canvasHeight)
+    pin:SetScript("OnEnter", function(self)
+      GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+      GameTooltip:SetText(marker.name or "Map marker")
+      GameTooltip:Show()
+    end)
+    pin:SetScript("OnLeave", function() GameTooltip:Hide() end)
+    mapMarkerButtons[#mapMarkerButtons+1] = pin
+  end
+  if #markers == 0 then lines[#lines+1] = "No boss pins on this floor yet." end
+  lines[#lines+1] = ""
+  if map.entrance then
+    lines[#lines+1] = "|cffffd27aENTRANCE|r"
+    lines[#lines+1] = map.entrance.zone
+    lines[#lines+1] = "/way " .. map.entrance.way
+  end
+  mapSideText:SetText(table.concat(lines, "\n"))
+  mapInfo:SetText("Select a numbered boss pin for encounter details.\nMap pins and floor coordinates are adapted from the MIT-licensed ForeverDungeonRoutes project.")
 end
 local function RenderQuests(entry)
   local quests = Tool:GetQuests(entry.id)
@@ -121,9 +240,13 @@ local function RenderSelected()
   selectedID = entry.id
   local tab = Tool.db.selectedTab or "overview"
   if tab == "map" then RenderMap(entry)
-  elseif tab == "quests" then RenderQuests(entry)
-  elseif tab == "bosses" then RenderBosses(entry)
-  else RenderOverview(entry) end
+  else
+    if mapContainer then mapContainer:Hide() end
+    detailBody:Show()
+    if tab == "quests" then RenderQuests(entry)
+    elseif tab == "bosses" then RenderBosses(entry)
+    else RenderOverview(entry) end
+  end
 end
 
 local function RefreshList()
@@ -229,6 +352,7 @@ local function CreateWindow()
   detailBody:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -16, 16)
   detailBody:SetJustifyV("TOP")
   detailBody:SetSpacing(3)
+  CreateMapPanel(panel)
 
   Tool.UI = {
     Toggle=function() if frame:IsShown() then frame:Hide() else frame:Show(); Tool.UI:Refresh() end end,
