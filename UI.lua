@@ -172,7 +172,7 @@ RenderMap = function(entry)
   local bossNumber = 0
   for i, marker in ipairs(markers) do
     if marker.kind == "boss" then bossNumber = bossNumber + 1 end
-    local label = marker.kind == "rare" and "R" or (marker.kind == "optional" and "+" or tostring(bossNumber))
+    local label = marker.kind == "quest" and "Q" or (marker.kind == "rare" and "R" or (marker.kind == "optional" and "+" or tostring(bossNumber)))
     if i <= 14 then lines[#lines+1] = label .. "  " .. tostring(marker.name) end
     local pin = MakeButton(mapCanvas, label, 24, 22, function()
       local note = marker.note
@@ -194,7 +194,17 @@ RenderMap = function(entry)
   if #markers == 0 then lines[#lines+1] = "No boss pins on this floor yet."
   elseif #markers > 14 then lines[#lines+1] = "... and " .. (#markers - 14) .. " more pins on the map." end
   lines[#lines+1] = ""
+  local quests = Tool:GetQuests(entry.id)
+  if #quests > 0 then
+    lines[#lines+1] = ""
+    lines[#lines+1] = "|cffffd27aQUEST STARTS|r"
+    for qIndex, quest in ipairs(quests) do
+      if qIndex <= 4 then lines[#lines+1] = tostring(quest.name) .. " — " .. tostring(quest.giverLocation or quest.giver or "See guide") end
+    end
+    if #quests > 4 then lines[#lines+1] = "... and " .. (#quests - 4) .. " more quests" end
+  end
   if map.entrance then
+    lines[#lines+1] = ""
     lines[#lines+1] = "|cffffd27aENTRANCE|r"
     lines[#lines+1] = map.entrance.zone
     if map.entrance.way then lines[#lines+1] = "/way " .. map.entrance.way
@@ -202,7 +212,7 @@ RenderMap = function(entry)
     else lines[#lines+1] = "Exact waypoint not yet verified." end
   end
   mapSideText:SetText(table.concat(lines, "\n"))
-  mapInfo:SetText("Select a numbered boss pin for encounter details.\nMap pins and floor coordinates are adapted from the MIT-licensed ForeverDungeonRoutes project.")
+  mapInfo:SetText("Select a numbered boss pin for encounter details, or a Q pin for a quest-related target.\nMap pins and floor coordinates are adapted from the MIT-licensed ForeverDungeonRoutes project.")
 end
 local function RenderQuests(entry)
   local quests = Tool:GetQuests(entry.id)
