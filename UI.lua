@@ -4,6 +4,7 @@ ns = ns or _G.TavernersDungeonToolNS
 local Core = _G.TavernersCore
 local Tool = ns and ns.Tool
 if not Core or not Tool then return end
+local DB = Tool.db
 
 local theme = Core.Theme or {}
 local gold = theme.gold or {0.88, 0.68, 0.28}
@@ -35,6 +36,7 @@ local function ClearRows()
   if listContent.rows then
     for _, row in ipairs(listContent.rows) do row:Hide(); row:SetParent(nil) end
   end
+  if listContent.empty then listContent.empty:Hide(); listContent.empty = nil end
   listContent.rows = {}
 end
 local function SetDetailText(title, sub, body)
@@ -239,10 +241,6 @@ local function CreateWindow()
   return frame
 end
 
-function Tool.UI:Show()
-  CreateWindow():Show()
-  Tool.UI:Refresh()
-end
 local eventFrame = CreateFrame("Frame")
 eventFrame:RegisterEvent("PLAYER_LOGIN")
 eventFrame:SetScript("OnEvent", function()
