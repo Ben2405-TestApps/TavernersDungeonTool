@@ -10,10 +10,11 @@ if not Data then
 end
 
 local Defaults = {
-  version = 1,
+  version = 2,
   selectedID = "ragefire_chasm",
   selectedTab = "overview",
   showRaids = false,
+  favouritesOnly = false,
   completedQuests = {},
   trackedQuests = {},
   favourites = {},
@@ -25,7 +26,33 @@ local Tool = {db=DB, data=Data, selected=nil, tab="overview"}
 ns.Tool = Tool
 
 function Tool:GetEntries()
-  return Data:GetAll(DB.showRaids and "Raid" or "Dungeon")
+  local source = Data:GetAll(DB.showRaids and "Raid" or "Dungeon")
+  local entries = {}
+  for _, entry in ipairs(source) do
+    if not DB.favouritesOnly or DB.favourites[entry.id] then
+      entries[#entries+1] = entry
+    end
+  end
+  return entries
+end
+function Tool:ToggleType()
+  DB.showRaids = not DB.showRaids
+  local entries = self:GetEntries()
+  local selected = Data:GetByID(DB.selectedID)
+  local selectedType = selected and selected.type
+  if not selected or (DB.showRaids and selectedType ~= "Raid") or (not DB.showRaids and selectedType ~= "Dungeon") then
+    DB.selectedID = entries[1] and entries[1].id or nil
+  end
+  if self.UI and self.UI.Refresh then self.UI:Refresh() end
+end
+function Tool:ToggleFavouritesOnly()
+  DB.favouritesOnly = not DB.favouritesOnly
+  local entries = self:GetEntries()
+  local selected = Data:GetByID(DB.selectedID)
+  local visible = false
+  for _, entry in ipairs(entries) do if selected and entry.id == selected.id then visible = true end end
+  if not visible then DB.selectedID = entries[1] and entries[1].id or nil end
+  if self.UI and self.UI.Refresh then self.UI:Refresh() end
 end
 function Tool:GetSelected()
   return Data:GetByID(DB.selectedID) or self:GetEntries()[1]
@@ -48,7 +75,7 @@ function Tool:Search(query)
   if query == "" then return results end
   for _, group in ipairs({Data.dungeons, Data.raids}) do
     for _, entry in ipairs(group) do
-      if entry.name:lower():find(query, 1, true) or (entry.zone or ""):lower():find(query, 1, true) then
+      if entry.name:lower():find(query, 1, true) or (entry.zone or ""):lower():find(query, 1, true) or (entry.continent or ""):lower():find(query, 1, true) then
         results[#results+1] = entry
       end
     end
