@@ -172,7 +172,7 @@ local function RenderMap(entry)
   for i, marker in ipairs(markers) do
     if marker.kind == "boss" then bossNumber = bossNumber + 1 end
     local label = marker.kind == "rare" and "R" or (marker.kind == "optional" and "+" or tostring(bossNumber))
-    lines[#lines+1] = label .. "  " .. tostring(marker.name)
+    if i <= 14 then lines[#lines+1] = label .. "  " .. tostring(marker.name) end
     local pin = MakeButton(mapCanvas, label, 24, 22, function()
       local note = marker.note
       for _, boss in ipairs(Tool:GetBosses(entry.id)) do
@@ -190,12 +190,15 @@ local function RenderMap(entry)
     pin:SetScript("OnLeave", function() GameTooltip:Hide() end)
     mapMarkerButtons[#mapMarkerButtons+1] = pin
   end
-  if #markers == 0 then lines[#lines+1] = "No boss pins on this floor yet." end
+  if #markers == 0 then lines[#lines+1] = "No boss pins on this floor yet."
+  elseif #markers > 14 then lines[#lines+1] = "... and " .. (#markers - 14) .. " more pins on the map." end
   lines[#lines+1] = ""
   if map.entrance then
     lines[#lines+1] = "|cffffd27aENTRANCE|r"
     lines[#lines+1] = map.entrance.zone
-    lines[#lines+1] = "/way " .. map.entrance.way
+    if map.entrance.way then lines[#lines+1] = "/way " .. map.entrance.way
+    elseif map.entrance.note then lines[#lines+1] = map.entrance.note
+    else lines[#lines+1] = "Exact waypoint not yet verified." end
   end
   mapSideText:SetText(table.concat(lines, "\n"))
   mapInfo:SetText("Select a numbered boss pin for encounter details.\nMap pins and floor coordinates are adapted from the MIT-licensed ForeverDungeonRoutes project.")
