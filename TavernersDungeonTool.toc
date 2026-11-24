@@ -1,8 +1,8 @@
 ## Interface: 16001
 ## Title: Taverners Dungeon Tool
-## Notes: Dungeon, map, quest, boss and loot companion for The Taverners Guild
+## Notes: Interactive dungeon maps, quests, bosses and loot for The Taverners Guild
 ## Author: The Taverners Guild
-## Version: 0.1.0
+## Version: 0.2.0
 ## Dependencies: TavernersCore
 ## SavedVariables: TavernersDungeonToolDB
 
