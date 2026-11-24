@@ -105,6 +105,15 @@ function Tool:GetQuests(id)
   for _, quest in ipairs(Data.quests or {}) do
     if quest.dungeonID == id then result[#result+1] = quest end
   end
+  -- Merge the separately maintained Wowhead Forever quest index from Quest Companion.
+  local entry = Data:GetByID(id)
+  local companion = Core.modules and Core.modules.QuestCompanion
+  if entry and companion and companion.GetDungeonQuests then
+    for _, q in ipairs(companion:GetDungeonQuests(entry.name)) do
+      result[#result+1] = {name=q.name, level=q.level, faction=q.faction, giver=q.giver,
+        giverLocation=q.location, coordinates=q.coords, prerequisites=q.prerequisite, objective=q.objective}
+    end
+  end
   return result
 end
 function Tool:GetMapData(id) return self.mapData[id] end
