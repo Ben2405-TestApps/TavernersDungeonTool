@@ -10,7 +10,7 @@ if not Data then
 end
 
 local Defaults = {
-  version = 2,
+  version = 3,
   selectedID = "ragefire_chasm",
   selectedTab = "overview",
   showRaids = false,
@@ -20,7 +20,7 @@ local Defaults = {
   favourites = {},
   windowScale = 1,
 }
-local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 2)
+local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 3)
 
 local Tool = {db=DB, data=Data, selected=nil, tab="overview"}
 ns.Tool = Tool
