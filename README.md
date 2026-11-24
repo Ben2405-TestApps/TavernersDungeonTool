@@ -12,7 +12,7 @@ A TavernersCore-powered dungeon journal for World of Warcraft: Forever.
 - Favourite instance storage with a dedicated filter
 - Saved selection and tab state
 - Wowhead-sourced quest, boss and loot records for the newer Forever dungeons
-- Interactive tiled dungeon maps for Classic instances using map assets already installed with the game client
+- Interactive multi-floor dungeon maps for Classic and new Forever instances, assembled from minimap tiles already installed with the game client
 - 288 clickable boss, rare, optional and quest-target markers across 29 mapped instances
 - Quest pickup locations and entrance waypoints shown alongside each floor map
 - Multi-floor navigation, boss pin tooltips and entrance waypoint details where verified
@@ -42,7 +42,7 @@ The catalogue includes the Classic instances and all nine new Forever dungeons. 
 ## Data and roadmap
 
 - Forever-specific catalogue entries are included where identified. Unknown level ranges, locations and entrances are deliberately left unverified.
-- The map catalogue includes floor IDs, in-client map tile references, entrance locations and normalized boss/rare/optional markers. Classic floor maps are assembled from the 12 map tiles already present in the WoW Forever client. New Forever dungeon marker positions are included; their Santiago Reyes map images are not bundled because the upstream MIT licence does not cover those artist-created images. Those floors display a labelled schematic with the verified markers until the relevant image permission/licence is included.
+- The map catalogue includes 71 floors and 1,320 in-client minimap tile references, entrance locations and normalized boss/rare/optional/quest-target markers. Both Classic and new Forever dungeon floors are assembled from minimap tiles already present in the WoW Forever client, positioned using the published floor-layout data. This avoids bundling Blizzard artwork or third-party map images while still providing real in-game map backgrounds for the boss and quest pins.
 - Quest, boss and loot records remain data-driven and will be populated from verifiable Forever sources and in-game checks.
 - Next content pass: add quest-giver/objective pins, fill in remaining quest and boss records, and add custom map artwork only where its licence or permission is documented.
 - Later enhancements: class/profession loot filters, quest-log status, group preparation checklist and saved loot/quest targets.
