@@ -10,7 +10,7 @@ if not Data then
 end
 
 local Defaults = {
-  version = 3,
+  version = 4,
   selectedID = "ragefire_chasm",
   selectedTab = "overview",
   showRaids = false,
@@ -19,10 +19,12 @@ local Defaults = {
   trackedQuests = {},
   favourites = {},
   windowScale = 1,
+  mapFloorIndex = {},
 }
-local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 3)
+local DB = Core.Database:Register("TavernersDungeonToolDB", Defaults, 4)
 
-local Tool = {db=DB, data=Data, selected=nil, tab="overview"}
+DB.mapFloorIndex = DB.mapFloorIndex or {}
+local Tool = {db=DB, data=Data, mapData=ns.MapData or {}, selected=nil, tab="overview"}
 ns.Tool = Tool
 
 function Tool:GetEntries()
@@ -89,6 +91,7 @@ function Tool:GetQuests(id)
   end
   return result
 end
+function Tool:GetMapData(id) return self.mapData[id] end
 function Tool:GetBosses(id)
   local result = {}
   for _, boss in ipairs(Data.bosses or {}) do
