@@ -7,5 +7,6 @@
 ## SavedVariables: TavernersDungeonToolDB
 
 DungeonData.lua
+DungeonMaps.lua
 DungeonTool.lua
 UI.lua
