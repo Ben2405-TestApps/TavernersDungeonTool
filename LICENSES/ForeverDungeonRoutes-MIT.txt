@@ -24,7 +24,9 @@ Adapted data in Taverners Dungeon Tool:
 - Dungeon floor IDs and installed-client tile references
 - Normalized boss, rare and optional encounter marker positions
 
-Outdoor `/way` coordinates and entrance notes are sourced separately from Wowhead Forever guides.\n\nOriginal project: https://github.com/Checkov23/ForeverDungeonRoutes
+Outdoor `/way` coordinates and entrance notes are sourced separately from Wowhead Forever guides.
+
+Original project: https://github.com/Checkov23/ForeverDungeonRoutes
 
 Important asset note: the MIT licence above does not cover Blizzard's in-game map artwork
 or Santiago Reyes' custom map images. Taverners Dungeon Tool loads Blizzard tile assets
