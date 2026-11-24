@@ -97,7 +97,7 @@ local function CreateMapPanel(panel)
   mapFloorLabel:SetPoint("LEFT", mapNextButton, "RIGHT", 10, 0)
 
   mapCanvas = CreateFrame("Frame", nil, mapContainer)
-  mapCanvas:SetSize(350, 264)
+  mapCanvas:SetSize(360, 240)
   mapCanvas:SetPoint("TOPLEFT", 0, -32)
   CreateBackdrop(mapCanvas)
   if mapCanvas.SetBackdropColor then mapCanvas:SetBackdropColor(0.10, 0.09, 0.07, 1) end
@@ -144,8 +144,20 @@ RenderMap = function(entry)
   mapPrevButton:SetEnabled(index > 1)
   mapNextButton:SetEnabled(index < #floors)
 
-  local canvasWidth, canvasHeight = 350, 264
-  if floor.tiles and #floor.tiles == 12 then
+  local canvasWidth, canvasHeight = 360, 240
+  if floor.minimapArt and #floor.minimapArt > 0 then
+    mapPlaceholder:Hide()
+    local scale = canvasWidth / 1002
+    for _, tile in ipairs(floor.minimapArt) do
+      local texture = mapCanvas:CreateTexture(nil, "ARTWORK", nil, tile.level or 0)
+      texture:SetTexture(tile.file)
+      texture:SetSize(tile.width * scale, tile.height * scale)
+      texture:SetPoint("TOPLEFT", mapCanvas, "TOPLEFT", tile.x * scale, -tile.y * scale)
+      local uv = tile.uv or {0, 0, 1, 0, 0, 1, 1, 1}
+      texture:SetTexCoord(uv[1], uv[2], uv[3], uv[4], uv[5], uv[6], uv[7], uv[8])
+      mapTileTextures[#mapTileTextures+1] = texture
+    end
+  elseif floor.tiles and #floor.tiles == 12 then
     mapPlaceholder:Hide()
     local tileWidth, tileHeight = canvasWidth / 4, canvasHeight / 3
     for i, fileID in ipairs(floor.tiles) do
@@ -158,7 +170,7 @@ RenderMap = function(entry)
       mapTileTextures[#mapTileTextures+1] = texture
     end
   else
-    mapPlaceholder:SetText("A custom floor image is not bundled for this level.\n\nVerified boss positions are still shown on this schematic map.")
+    mapPlaceholder:SetText("No client minimap tiles are available for this level yet.\n\nVerified boss positions are still shown on this schematic map.")
     mapPlaceholder:Show()
   end
 
