@@ -12,7 +12,10 @@ A TavernersCore-powered dungeon journal for World of Warcraft: Forever.
 - Favourite instance storage with a dedicated filter
 - Saved selection and tab state
 - Wowhead-sourced quest, boss and loot records for the newer Forever dungeons
-- Wowhead guide references retained per instance; map artwork is linked rather than copied
+- Interactive tiled dungeon maps for Classic instances using map assets already installed with the game client
+- 288 clickable boss, rare and optional encounter markers across 29 mapped instances
+- Multi-floor navigation, boss pin tooltips and entrance waypoint details where verified
+- Wowhead guide references retained per instance; third-party custom map artwork is not bundled
 - Data-driven catalogue designed for verified maps, quests, bosses and loot
 
 ## Install
@@ -38,9 +41,9 @@ The catalogue includes the Classic instances and all nine new Forever dungeons. 
 ## Data and roadmap
 
 - Forever-specific catalogue entries are included where identified. Unknown level ranges, locations and entrances are deliberately left unverified.
-- The map schema supports multiple floors and normalized marker coordinates for bosses, entrances, quest givers and objectives. No invented coordinates or placeholder artwork are presented as real maps.
+- The map catalogue includes floor IDs, in-client map tile references, entrance locations and normalized boss/rare/optional markers. Classic floor maps are assembled from the 12 map tiles already present in the WoW Forever client. New Forever dungeon marker positions are included; their Santiago Reyes map images are not bundled because the upstream MIT licence does not cover those artist-created images. Those floors display a labelled schematic with the verified markers until the relevant image permission/licence is included.
 - Quest, boss and loot records remain data-driven and will be populated from verifiable Forever sources and in-game checks.
-- Next content pass: complete the remaining quest and boss coverage, then build original local floor-map assets and verified map pins.
+- Next content pass: add quest-giver/objective pins, fill in remaining quest and boss records, and add custom map artwork only where its licence or permission is documented.
 - Later enhancements: class/profession loot filters, quest-log status, group preparation checklist and saved loot/quest targets.
 - TavernersCore diagnostics and dependency reporting remain part of the shared addon foundation.
 
